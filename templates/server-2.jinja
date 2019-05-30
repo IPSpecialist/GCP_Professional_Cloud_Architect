@@ -1,0 +1,34 @@
+resources:
+- name: website-2
+  type: compute.v1.instance
+  properties:
+    zone: us-east1-c
+    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/us-east1-c/machineTypes/f1-micro
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          apt update
+          apt install -y apache2
+          cat <<EOF > /var/www/html/index.html
+          <html><body>
+          <h2>Welcome to your custom website.</h2>
+          <h2>VERSION 2.</h2>
+          </body></html>
+          EOF
+    tags:
+      items: ["http-server"]
+    networkInterfaces:
+    - network: $(ref.network-2.selfLink)
+      subnetwork: $(ref.subnet-b.selfLink)
+      # Access Config required to give the instance a public IP address
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT

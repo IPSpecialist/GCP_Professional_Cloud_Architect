@@ -1,0 +1,16 @@
+imports:
+- path: server-1.jinja
+- path: server-2.jinja
+- path: network-1.jinja
+- path: network-2.jinja
+
+
+resources:
+- name: server-1
+  type: server-1.jinja
+- name: network-1
+  type: network-1.jinja
+- name: server-2
+  type: server-2.jinja
+- name: network-2
+  type: network-2.jinja
