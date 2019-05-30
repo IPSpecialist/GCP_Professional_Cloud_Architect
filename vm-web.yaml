@@ -1,0 +1,42 @@
+# CHANGE YOUR PROJECT ID'S BEFORE DEPLOYING
+
+resources:
+- type: compute.v1.instance
+  name: web-1
+  properties:
+    zone: us-east1-c
+    machineType: https://www.googleapis.com/compute/v1/projects/(YOUR_PROJECT)/zones/us-east1-c/machineTypes/f1-micro # CHANGE ME
+    disks:
+    - deviceName: base-1
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          apt update
+          apt install -y apache2
+          cat <<EOF > /var/www/html/index.html
+          <html><body>
+          <h2>Welcome to your custom website.</h2>
+          <h2>VERSION 1.</h2>
+          </body></html>
+          EOF
+    tags:
+      items: ["http-server"]
+    networkInterfaces:
+    - network: https://www.googleapis.com/compute/v1/projects/(YOUR_PROJECT)/global/networks/default # CHANGE ME
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+- type: compute.v1.firewall
+  name: default-allow-http 
+  properties:
+    targetTags: ["http-server"]
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+      - IPProtocol: TCP
+        ports: ["80"] 

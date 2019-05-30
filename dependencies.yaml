@@ -1,0 +1,91 @@
+# CHANGE YOUR PROJECT ID'S BEFORE DEPLOYING
+
+resources:
+- type: compute.v1.instance
+  name: server-1
+  properties:
+    zone: us-central1-a
+    machineType: https://www.googleapis.com/compute/v1/projects/(YOUR_PROJECT)/zones/us-central1-a/machineTypes/f1-micro #CHANGE ME
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+    networkInterfaces:
+    - network: $(ref.network-1.selfLink)
+      subnetwork: $(ref.subnet-a.selfLink)
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+- type: compute.v1.network
+  name: network-1
+  properties:
+    autoCreateSubnetworks: false
+- name: subnet-a
+  type: compute.v1.subnetwork
+  properties:
+    ipCidrRange: 10.0.1.0/24
+    network: $(ref.network-1.selfLink)
+    privateIpGoogleAccess: false
+    region: us-central1
+- name: ssh-network-1
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.network-1.selfLink)
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: TCP
+      ports: ["22"]
+- name: icmp-network-1
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.network-1.selfLink)
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: ICMP
+- type: compute.v1.instance
+  name: server-2
+  properties:
+    zone: us-east1-b
+    machineType: https://www.googleapis.com/compute/v1/projects/(YOUR_PROJECT)/zones/us-east1-b/machineTypes/f1-micro #CHANGE ME
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+    networkInterfaces:
+    - network: $(ref.network-2.selfLink)
+      subnetwork: $(ref.subnet-b.selfLink)
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+- type: compute.v1.network
+  name: network-2
+  properties:
+    autoCreateSubnetworks: false
+- name: subnet-b
+  type: compute.v1.subnetwork
+  properties:
+    ipCidrRange: 10.0.2.0/24
+    network: $(ref.network-2.selfLink)
+    privateIpGoogleAccess: false
+    region: us-east1
+- name: ssh-network-2
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.network-2.selfLink)
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: TCP
+      ports: ["22"]
+- name: icmp-network-2
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.network-2.selfLink)
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: ICMP
