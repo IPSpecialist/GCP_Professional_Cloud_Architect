@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: la-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: la-app
+    version: 1.0.0
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
